@@ -1,3 +1,8 @@
+---
+title: Baza danych
+nav_order: 7
+---
+
 # Baza danych
 
 ## Silnik

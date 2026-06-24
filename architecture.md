@@ -1,3 +1,8 @@
+---
+title: Architektura
+nav_order: 6
+---
+
 # Architektura systemu
 
 ## Diagram ogólny

@@ -1,3 +1,8 @@
+---
+title: Przewodnik użytkownika
+nav_order: 2
+---
+
 # Przewodnik użytkownika
 
 > Ten przewodnik wyjaśnia, jak korzystać z VCN MCP bez znajomości programowania.

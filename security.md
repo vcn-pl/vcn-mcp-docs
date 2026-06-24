@@ -1,3 +1,8 @@
+---
+title: Bezpieczeństwo
+nav_order: 8
+---
+
 # Bezpieczeństwo
 
 ## Model bezpieczeństwa — przegląd

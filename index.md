@@ -1,5 +1,6 @@
 ---
-title: VCN MCP Server — Dokumentacja
+title: Strona główna
+nav_order: 1
 ---
 
 # VCN MCP Server — Dokumentacja

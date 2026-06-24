@@ -1,3 +1,8 @@
+---
+title: Instalacja
+nav_order: 3
+---
+
 # Instalacja i wdrożenie
 
 ## Wymagania

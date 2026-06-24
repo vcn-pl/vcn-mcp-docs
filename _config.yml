@@ -1,6 +1,18 @@
-title: VCN MCP Server — Dokumentacja
-description: Serwer MCP łączący Claude z zasobami firmy
-remote_theme: pages-themes/cayman@v0.2.0
+title: VCN MCP Server
+description: Dokumentacja serwera MCP łączącego Claude z zasobami firmy
+remote_theme: just-the-docs/just-the-docs@v0.10.0
+
+url: ""
+
+search_enabled: true
+nav_sort: order
+
+aux_links:
+  "GitHub":
+    - "https://github.com/pawi1/vnet-mcp"
+
+footer_content: "VCN MCP Server"
+
 plugins:
   - jekyll-remote-theme
   - jekyll-seo-tag
