@@ -1,19 +1,14 @@
----
-title: Konfiguracja
-nav_order: 4
----
-
 # Konfiguracja
 
 ## Pliki konfiguracyjne
 
 System konfigurowany jest przez dwa źródła:
-1. `mcp/config.json` — ścieżki, ustawienia serwera, tenanty
+1. `config.json` — ścieżki, ustawienia serwera, tenanty (domyślna lokalizacja: `/etc/vcn-mcp/config.json`)
 2. Zmienne środowiskowe — sekrety (tokeny, klucze)
 
 ---
 
-## mcp/config.json
+## config.json
 
 Pełna struktura:
 
@@ -27,14 +22,17 @@ Pełna struktura:
   "server": {
     "url": "https://twoja-domena.pl",
     "name": "vcn-mcp",
-    "version": "26.07.02",
+    "version": "26.07.05",
     "host": "0.0.0.0",
     "port": 8000
   },
   "auth": {
     "token_expire_days": 90
   },
-  "tenants": ["vnet", "tools"]
+  "tenants": ["vnet", "tools"],
+  "integrations": {
+    "pages_api_url": "https://twoja-domena.pl/api/pages/"
+  }
 }
 ```
 
@@ -68,6 +66,12 @@ Z `vcn_root` wywodzone są automatycznie:
 |---|---|---|
 | `token_expire_days` | Ważność tokenów JWT (dni) | 90 |
 
+### integrations
+
+| Klucz | Opis |
+|---|---|
+| `pages_api_url` | URL REST API stron CMS — używane przez narzędzia `search_pages` i `get_page` |
+
 ### tenants
 
 Lista identyfikatorów tenantów dostępnych w systemie. Musi zgadzać się z katalogami w `knowledge_root` i `templates/`.
@@ -84,7 +88,7 @@ Sekrety **nigdy** nie powinny trafiać do `config.json`. Przekazywane przez zmie
 
 | Zmienna | Opis |
 |---|---|
-| `JWT_SECRET_KEY` | Klucz podpisywania JWT (min. 256 bitów). Generuj: `python3 -c "import secrets; print(secrets.token_hex(32))"` |
+| `SECRET_KEY` | Klucz podpisywania JWT (min. 256 bitów). Generuj: `python3 -c "import secrets; print(secrets.token_hex(32))"` |
 | `TELEGRAM_BOT_TOKEN` | Token bota Telegram (z BotFather) |
 | `TELEGRAM_CHAT_ID` | ID czatu prywatnego (debug) |
 | `TELEGRAM_LOG_CHAT_ID` | ID czatu logów operacyjnych |
@@ -93,8 +97,12 @@ Sekrety **nigdy** nie powinny trafiać do `config.json`. Przekazywane przez zmie
 
 | Zmienna | Opis | Domyślnie |
 |---|---|---|
-| `VCN_DB_PATH` | Nadpisuje ścieżkę do SQLite | `{vcn_root}/vnet.db` |
-| `LOG_LEVEL` | Poziom logowania | `INFO` |
+| `MCP_CONFIG_PATH` | Ścieżka do `config.json` | katalog binarki |
+| `LOG_DIR` | Nadpisuje `paths.log_dir` z config.json | `{vcn_root}/tmp/logs` |
+| `MCP_HOST` | Adres bind serwera | wartość z config.json |
+| `MCP_PORT` | Port serwera | wartość z config.json |
+| `SERVER_URL` | Publiczny URL serwera | wartość z config.json |
+| `PAGES_API_URL` | URL API stron CMS (nadpisuje `integrations.pages_api_url`) | — |
 
 ---
 
@@ -148,7 +156,7 @@ Szczegóły → [database.md](database.md).
 
 Minimalna konfiguracja do lokalnego developmentu:
 
-**mcp/config.json:**
+**config.json:**
 ```json
 {
   "paths": {
@@ -172,7 +180,7 @@ Minimalna konfiguracja do lokalnego developmentu:
 
 **Zmienne środowiskowe (opcjonalne dla dev):**
 ```bash
-export JWT_SECRET_KEY=dev-secret-not-for-production
+export SECRET_KEY=dev-secret-not-for-production
 export TELEGRAM_BOT_TOKEN=    # puste = Telegram wyłączony
 export TELEGRAM_CHAT_ID=0
 export TELEGRAM_LOG_CHAT_ID=0

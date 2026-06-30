@@ -1,8 +1,3 @@
----
-title: Development
-nav_order: 9
----
-
 # Przewodnik developera
 
 ## Struktura projektu
@@ -87,7 +82,7 @@ mkdir -p /tmp/vnet-dev/{base,logs,templates/dev,generated,files,tmp/offers}
 
 Zmienne środowiskowe:
 ```bash
-export JWT_SECRET_KEY=dev-only-not-for-prod
+export SECRET_KEY=dev-only-not-for-prod
 export TELEGRAM_BOT_TOKEN=
 export TELEGRAM_CHAT_ID=0
 export TELEGRAM_LOG_CHAT_ID=0

@@ -1,8 +1,3 @@
----
-title: Instalacja
-nav_order: 3
----
-
 # Instalacja i wdrożenie
 
 ## Wymagania
@@ -31,110 +26,68 @@ httpx        # async HTTP client
 
 ## Instalacja krok po kroku
 
-### 1. Klonowanie repozytorium
+### 1. Skopiuj binarki
 
 ```bash
-git clone <url> /opt/vnet-mcp
-cd /opt/vnet-mcp
+cp dist/vcn-mcp /usr/local/bin/vcn-mcp
+cp dist/vcn-ui  /usr/local/bin/vcn-ui
+chmod +x /usr/local/bin/vcn-mcp /usr/local/bin/vcn-ui
 ```
 
-### 2. Środowisko Python
+### 2. Uruchom wizard konfiguracyjny
 
 ```bash
-python3.12 -m venv /opt/vnet-mcp/venv
-source /opt/venv/bin/activate
-pip install -r mcp/requirements.txt
+vcn-mcp --setup
 ```
 
-### 3. Konfiguracja
-
-Skopiuj przykładowy config i dostosuj:
+Wizard interaktywnie:
+- tworzy `/etc/vcn-mcp/config.json`
+- tworzy katalogi danych (`/srv/vnet-mcp/data/` i podkatalogi)
+- tworzy `/var/log/vcn-mcp/`
+- tworzy pusty plik bazy danych (`vnet.db`)
+- generuje `/etc/vcn-mcp/vcn-mcp.env` z losowym `SECRET_KEY` (chmod 600)
 
 ```bash
-cp services/config.example.json mcp/config.json
+vcn-ui --setup
 ```
 
-Edytuj `mcp/config.json`:
+Wizard UI tworzy `/etc/vcn-mcp/vcn-ui.env` z losowym `UI_SESSION_SECRET`.
 
-```json
-{
-  "paths": {
-    "vcn_root": "/srv/vnet-mcp/data",
-    "knowledge_root": "/srv/vnet-mcp/data/base",
-    "log_dir": "/var/log/vcn-mcp"
-  },
-  "server": {
-    "url": "https://twoja-domena.pl",
-    "name": "vcn-mcp",
-    "version": "26.07.02",
-    "host": "0.0.0.0",
-    "port": 8000
-  },
-  "auth": {
-    "token_expire_days": 90
-  },
-  "tenants": ["vnet", "tools"]
-}
-```
-
-Szczegóły wszystkich opcji → [configuration.md](configuration.md).
-
-### 4. Zmienne środowiskowe
-
-Skopiuj przykładowy plik i uzupełnij:
+### 3. Uzupełnij env pliki
 
 ```bash
-cp services/vcn-mcp.env.example /etc/vcn-mcp.env
-chmod 600 /etc/vcn-mcp.env
+nano /etc/vcn-mcp/vcn-mcp.env
 ```
 
-Wymagane zmienne:
+Wymagane do uzupełnienia:
 ```bash
 TELEGRAM_BOT_TOKEN=your_token
 TELEGRAM_CHAT_ID=your_personal_chat_id
 TELEGRAM_LOG_CHAT_ID=your_log_chat_id
-JWT_SECRET_KEY=your_random_secret_256bit
+ADMIN_EMAIL=admin@firma.pl
 ```
 
-Generowanie `JWT_SECRET_KEY`:
+Opcjonalnie (integracja z CMS):
 ```bash
-python3 -c "import secrets; print(secrets.token_hex(32))"
+PAGES_API_URL=https://twoja-domena.pl/api/pages/
 ```
 
-### 5. Struktura danych
+Szczegóły wszystkich opcji → [configuration.md](configuration.md).
 
-Utwórz katalogi:
-```bash
-mkdir -p /srv/vnet-mcp/data/base
-mkdir -p /srv/vnet-mcp/data/knowledge
-mkdir -p /srv/vnet-mcp/data/templates
-mkdir -p /srv/vnet-mcp/data/generated
-mkdir -p /srv/vnet-mcp/data/files
-mkdir -p /srv/vnet-mcp/data/tmp/offers
-mkdir -p /var/log/vcn-mcp
-```
-
-### 6. Weryfikacja konfiguracji
+### 4. Pierwszy start
 
 ```bash
-python3 scripts/config_check.py
-```
-
-### 7. Pierwszy start
-
-```bash
-cd mcp
-python3 main.py
+vcn-mcp
 ```
 
 Serwer powinien:
-- wypisać "✅ All checks passed"
+- wypisać `✅ All checks passed`
 - uruchomić się na `http://0.0.0.0:8000`
 - wysłać powiadomienie Telegram o starcie
 
 Sprawdź: `curl http://localhost:8000/health`
 
-### 8. Pierwszy użytkownik (admin)
+### 5. Pierwszy użytkownik (admin)
 
 Otwórz `http://localhost:8000/setup` — zaloguj się i wygeneruj pierwszy token.
 
@@ -170,17 +123,10 @@ rc-service vcn-mcp start
 
 ## Panel UI (Node.js)
 
-### Instalacja
-
-```bash
-cd ui
-npm install
-```
-
 ### Konfiguracja
 
-UI czyta tę samą `mcp/config.json` co serwer Python.  
-Dodatkowe ustawienia w `services/vcn-ui.env.example`.
+UI czyta `config.json` z `/etc/vcn-mcp/config.json` (lub przez `MCP_CONFIG_PATH`).  
+Env plik: `/etc/vcn-mcp/vcn-ui.env` — generowany przez `vcn-ui --setup`.
 
 ### Uruchomienie
 
@@ -238,10 +184,10 @@ server {
 ## Aktualizacja
 
 ```bash
-cd /opt/vnet-mcp
-git pull
-pip install -r mcp/requirements.txt   # jeśli zmieniły się zależności
-systemctl restart vcn-mcp
+# skopiuj nowe binarki
+cp dist/vcn-mcp /usr/local/bin/vcn-mcp
+cp dist/vcn-ui  /usr/local/bin/vcn-ui
+systemctl restart vcn-mcp vcn-ui
 ```
 
 Serwer wyśle powiadomienie Telegram o zatrzymaniu (stop) i uruchomieniu (start).
@@ -252,9 +198,9 @@ Serwer wyśle powiadomienie Telegram o zatrzymaniu (stop) i uruchomieniu (start)
 
 ### Serwer nie startuje
 
-1. Sprawdź logi: `journalctl -u vcn-mcp -n 50`
-2. Sprawdź config: `python3 scripts/config_check.py`
-3. Upewnij się, że katalogi z `paths` istnieją i mają właściwe uprawnienia
+1. Sprawdź logi: `journalctl -u vcn-mcp -n 50` lub `tail /var/log/vcn-mcp/mcp_server.log`
+2. Jeśli brak config: `vcn-mcp --setup`
+3. Upewnij się, że katalogi z `paths` istnieją (`/srv/vnet-mcp/data/`, `vnet.db`)
 
 ### Brak powiadomień Telegram
 
@@ -265,5 +211,5 @@ Serwer wyśle powiadomienie Telegram o zatrzymaniu (stop) i uruchomieniu (start)
 ### 401 przy wywołaniu MCP
 
 1. Sprawdź, czy token nie wygasł (90 dni)
-2. Zweryfikuj `JWT_SECRET_KEY` — zmiana klucza unieważnia wszystkie tokeny
+2. Zweryfikuj `SECRET_KEY` — zmiana klucza unieważnia wszystkie tokeny
 3. Sprawdź logi serwera — pojawiają się tam przyczyny odmowy

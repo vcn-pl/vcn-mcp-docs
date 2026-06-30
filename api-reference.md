@@ -1,8 +1,3 @@
----
-title: API Reference
-nav_order: 5
----
-
 # API Reference
 
 ## Protokół MCP (`/mcp`)
@@ -121,6 +116,33 @@ Lista dostępnych szablonów DOCX dla danego tenanta.
 Parametry:
   tenant: str
 ```
+
+---
+
+### Strony CMS
+
+#### `search_pages`
+Szuka stron na stronie VCN po nazwie lub słowach kluczowych. Cache 5 minut.
+
+```
+Parametry:
+  query: str         — szukana fraza, np. "monitoring", "kontakt"
+  limit: int         — liczba wyników (domyślnie 5)
+```
+
+Zwraca: lista stron z polem `slug`, `h1`, URL i fragmentem treści.
+
+#### `get_page`
+Pobiera pełną stronę po slugu — zwraca surowy HTML z inline styles.
+
+```
+Parametry:
+  slug: str          — slug strony, np. "kontakt" lub "oferta/monitoring"
+```
+
+Zwraca: metadane strony + pełny `htmlContent` gotowy do edycji/naśladowania stylu.
+
+**Workflow edycji strony:** `search_pages` → znajdź slug → `get_page` → przeanalizuj HTML → (opcjonalnie `upload_file` dla zdjęć) → wygeneruj nowy HTML → user wkleja w CMS.
 
 ---
 
