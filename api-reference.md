@@ -1,3 +1,8 @@
+---
+title: API Reference
+nav_order: 5
+---
+
 # API Reference
 
 ## Protokół MCP (`/mcp`)

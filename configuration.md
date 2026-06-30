@@ -1,3 +1,8 @@
+---
+title: Konfiguracja
+nav_order: 4
+---
+
 # Konfiguracja
 
 ## Pliki konfiguracyjne
